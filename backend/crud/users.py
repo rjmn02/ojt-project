@@ -1,17 +1,17 @@
-from fastapi import HTTPException
-from dependencies import AsyncSessionDep, get_password_hash
+from fastapi import Depends, HTTPException
+from dependencies import AsyncSessionDep, get_current_active_user, get_password_hash
 from models.users import User, AccountStatus, AccountType
 from models.system_logs import System_Log
 from schemas.users import UserCreate, UserEdit
 from sqlalchemy import select, or_
-from typing import Optional
+from typing import Annotated, Optional
 from sqlalchemy.exc import IntegrityError
 
 
 async def create_user(
     db: AsyncSessionDep,
     user_create: UserCreate,
-    current_user
+    current_user: Annotated[User, Depends(get_current_active_user)] 
 ):
   new_user = User(
     # Information
@@ -29,8 +29,7 @@ async def create_user(
   
   system_log = System_Log(
     action=f"New User {user_create.email} created successfully.",
-    user_id=current_user.get("id"),
-    created_by=current_user.get("sub"),
+    user_id=current_user.id
   )
   
   try:
@@ -50,12 +49,13 @@ async def create_user(
 
 
 async def get_users(
-    db: AsyncSessionDep,
-    offset: int = 0,
-    limit: int = 10,
-    type: Optional[AccountType] = None,
-    status: Optional[AccountStatus] = None,
-    search: Optional[str] = None
+  db: AsyncSessionDep,
+  current_user: Annotated[User, Depends(get_current_active_user)],
+  offset: int = 0,
+  limit: int = 10,
+  type: Optional[AccountType] = None,
+  status: Optional[AccountStatus] = None,
+  search: Optional[str] = None
 ):
   
   query = select(User)
@@ -64,14 +64,14 @@ async def get_users(
   if status:
       query = query.where(User.status == status)
   if search:
-      query = query.where(
-          or_(
-              User.firstname.ilike(f"%{search}%"),
-              User.middlename.ilike(f"%{search}%"),
-              User.lastname.ilike(f"%{search}%"),
-              User.email.ilike(f"%{search}%"),
-          )
+    query = query.where(
+      or_(
+        User.firstname.ilike(f"%{search}%"),
+        User.middlename.ilike(f"%{search}%"),
+        User.lastname.ilike(f"%{search}%"),
+        User.email.ilike(f"%{search}%"),
       )
+    )
   query = query.offset(offset).limit(limit)
   result = await db.execute(query)
   return result.scalars().all()
@@ -96,7 +96,7 @@ async def update_user_by_id(
   id: int,
   db: AsyncSessionDep,
   user_edit: UserEdit,
-  current_user
+  current_user: Annotated[User, Depends(get_current_active_user)]
 ):          
   try:
     async with db.begin():
@@ -116,8 +116,7 @@ async def update_user_by_id(
       
       system_log = System_Log(
         action=f"User {user.email} updated successfully.",
-        user_id=current_user.get("id"),
-        created_by=current_user.get("sub"),
+        user_id=current_user.id
       )
       
       await db.add(system_log)

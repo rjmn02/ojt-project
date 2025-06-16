@@ -1,17 +1,19 @@
-from typing import List, Optional
-from fastapi import HTTPException
-from pymysql import IntegrityError
+from typing import Annotated, List, Optional
+from fastapi import Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import String, cast, or_, select
-from backend.dependencies import AsyncSessionDep
+from backend.dependencies import AsyncSessionDep, get_current_active_user
 from backend.models.cars import Car, CarStatus, FuelType, TransmissionType
 from backend.models.system_logs import System_Log
+from backend.models.users import User
 from backend.schemas.cars import CarCreate, CarEdit
 
 
 async def create_car(
     db: AsyncSessionDep,
     car_create: CarCreate,
-    current_user
+    current_user: Annotated[User, Depends(get_current_active_user)] 
+
 ):
   new_car = Car(
     vin = car_create.vin,
@@ -24,13 +26,12 @@ async def create_car(
     transmission_type = car_create.transmission_type,
     fuel_type = car_create.fuel_type,
     
-    created_by = current_user.get("sub")
+    created_by = current_user.id
   )
   
   system_log = System_Log(
-    action=f"New Car {car_create.vin} {car_create.year} {car_create.make} {car_create.model} created successfully.",
-    user_id=current_user.get("id"),
-    created_by=current_user.get("sub"),
+    action=f"User {current_user.id} created car {car_create.vin}",
+    user_id=current_user.id,
   )
   
   try:
@@ -40,7 +41,7 @@ async def create_car(
         system_log
       ])
       await db.commit()
-      return {"detail": "Car successfully created."}
+      return {"detail": "Car {car.vin} {car.year} {car.make} {car.model} created successfully"}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
@@ -51,8 +52,10 @@ async def create_car(
 
 async def get_cars(
   db: AsyncSessionDep,
+  current_user: Annotated[User, Depends(get_current_active_user)],
   offset: int = 0,
   limit: int = 10,
+  year: Optional[int] = None,
   transmission_type: Optional[TransmissionType] = None,
   status: Optional[CarStatus] = None,
   fuel_type: Optional[FuelType] = None,
@@ -66,11 +69,12 @@ async def get_cars(
     query = query.where(Car.status == status)
   if(fuel_type):
     query = query.where(Car.fuel_type == fuel_type)
+  if(year):
+    query = query.where(Car.year == year)
     
   if search:
     query = query.where(
       or_(
-        cast(Car.year, String).ilike(f"%{search}%"),
         Car.make.ilike(f"%{search}%"),
         Car.model.ilike(f"%{search}%"),
         Car.color.ilike(f"%{search}%"),
@@ -104,7 +108,7 @@ async def update_car_by_id(
   id: int,
   db: AsyncSessionDep,
   car_edit: CarEdit,
-  current_user
+  current_user: Annotated[User, Depends(get_current_active_user)],
 ):
             
   try:
@@ -121,18 +125,17 @@ async def update_car_by_id(
       car.transmission_type = car_edit.transmission_type,
       car.fuel_type = car_edit.fuel_type
       
-      car.updated_by = current_user.get("sub")
+      car.updated_by = current_user.id
       
       
       system_log = System_Log(
-        action=f"Car {car.vin} {car.year} {car.make} {car.model} updated successfully.",
-        user_id=current_user.get("id"),
-        created_by=current_user.get("sub"),
+        action=f"User {current_user.id} updated car {car.vin}",
+        user_id=current_user.id,
       )
       
       await db.add(system_log)
       await db.commit()
-      return {"detail": "User successfully updated."}
+      return {"detail": "Car {car.vin} {car.year} {car.make} {car.model} updated successfully"}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
