@@ -1,9 +1,9 @@
 from typing import Annotated, List, Optional
 from fastapi import  APIRouter, Depends
-from backend.crud.system_logs import read_system_logs
-from backend.dependencies import AsyncSessionDep, get_current_active_user
-from backend.models.users import User
-from backend.schemas.system_logs import SystemLogsResponse
+from crud.system_logs import read_system_logs
+from dependencies import AsyncSessionDep, get_current_active_user
+from models.users import User
+from schemas.system_logs import SystemLogsResponse
 
 
 router = APIRouter(

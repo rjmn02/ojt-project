@@ -1,9 +1,9 @@
 from typing import Annotated, List, Optional
 from fastapi import  APIRouter, Depends
-from backend.crud.users import create_user, read_user_by_id, read_users, update_user_by_id
-from backend.dependencies import AsyncSessionDep, get_current_active_user
-from backend.models.users import AccountStatus, AccountType, User
-from backend.schemas.users import UserCreate, UserEdit, UserResponse
+from crud.users import create_user, read_user_by_id, read_users, update_user_by_id
+from dependencies import AsyncSessionDep, get_current_active_user
+from models.users import AccountStatus, AccountType, User
+from schemas.users import UserCreate, UserEdit, UserResponse
 
 
 router = APIRouter(

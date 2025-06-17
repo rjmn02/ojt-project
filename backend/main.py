@@ -2,7 +2,6 @@ from fastapi import FastAPI, Cookie
 from contextlib import asynccontextmanager
 from database import engine
 from models.base import Base  # ADDED IMPORT
-from models import cars, sales_transactions, system_logs, users 
 from routers import cars, login, sales_transactions, system_logs, users
 
 # The first part of the function, before the yield, will be executed before the application starts.

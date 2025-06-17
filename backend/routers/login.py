@@ -1,9 +1,9 @@
 
 from datetime import timedelta
 from fastapi import  APIRouter, HTTPException, status
-from backend.dependencies import ACCESS_TOKEN_EXPIRE_MINUTES, AsyncSessionDep, authenticate_user, create_access_token
-from backend.schemas.login import LoginRequest
-from backend.schemas.tokens import Token
+from dependencies import ACCESS_TOKEN_EXPIRE_MINUTES, AsyncSessionDep, authenticate_user, create_access_token
+from schemas.login import LoginRequest
+from schemas.tokens import Token
 
 
 router = APIRouter()

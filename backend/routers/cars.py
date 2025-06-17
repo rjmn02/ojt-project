@@ -1,11 +1,11 @@
 from typing import Annotated, List, Optional
 from fastapi import  APIRouter, Depends
-from backend.crud.cars import create_car, read_car_by_id, read_cars, update_car_by_id
-from backend.dependencies import AsyncSessionDep, get_current_active_user
-from backend.models.cars import CarStatus, FuelType, TransmissionType
-from backend.models.users import User
-from backend.schemas.cars import CarCreate, CarEdit, CarResponse
-from backend.schemas.users import UserResponse
+from crud.cars import create_car, read_car_by_id, read_cars, update_car_by_id
+from dependencies import AsyncSessionDep, get_current_active_user
+from models.cars import CarStatus, FuelType, TransmissionType
+from models.users import User
+from schemas.cars import CarCreate, CarEdit, CarResponse
+from schemas.users import UserResponse
 
 
 router = APIRouter(

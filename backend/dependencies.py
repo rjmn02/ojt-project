@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
-from backend.crud.users import get_user_by_email
-from backend.schemas.tokens import TokenData
+from crud.users import get_user_by_email
+from schemas.tokens import TokenData
 from database import get_session
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
@@ -13,6 +13,8 @@ import os
 from dotenv import load_dotenv
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
+
+load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")

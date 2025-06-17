@@ -1,11 +1,11 @@
-from typing import Optional
-from fastapi import HTTPException
+from typing import Annotated, List, Optional
+from fastapi import Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import or_, select
-from backend.models.cars import Car, CarStatus, FuelType, TransmissionType
-from backend.models.system_logs import System_Log
-from backend.models.users import User
-from backend.schemas.cars import CarCreate, CarEdit
+from sqlalchemy import String, cast, or_, select
+from models.cars import Car, CarStatus, FuelType, TransmissionType
+from models.system_logs import System_Log
+from models.users import User
+from schemas.cars import CarCreate, CarEdit
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

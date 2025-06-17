@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlalchemy import  or_, select
-from backend.models.system_logs import System_Log
-from backend.models.users import User
+from models.system_logs import System_Log
+from models.users import User
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

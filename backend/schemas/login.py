@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from backend.models.users import AccountType
+from models.users import AccountType
 
 class LoginRequest(BaseModel):
     email: str

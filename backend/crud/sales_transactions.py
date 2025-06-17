@@ -2,11 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
-from backend.dependencies import get_current_active_user
-from backend.models.sales_transactions import Sales_Transaction
-from backend.models.system_logs import System_Log
-from backend.models.users import User
-from backend.schemas.sales_transactions import SalesTransactionCreate, SalesTransactionEdit
+from models.sales_transactions import Sales_Transaction
+from models.system_logs import System_Log
+from models.users import User
+from schemas.sales_transactions import SalesTransactionCreate, SalesTransactionEdit
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
