@@ -7,8 +7,8 @@ from schemas.sales_transactions import SalesTransactionCreate, SalesTransactionU
 
 
 router = APIRouter(
-  prefix="/api/sales_transaction",
-  tags=["sales_transaction"],
+  prefix="/api/sales_transactions",
+  tags=["sales_transactions"],
   dependencies=[
     Depends(get_current_active_user)
   ]
