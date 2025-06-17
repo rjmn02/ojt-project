@@ -41,7 +41,7 @@ async def get_cars(
   )
 
 
-@router.get("/{id}", response_model=[UserResponse])
+@router.get("/{id}", response_model=CarResponse)
 async def get_car_by_id(
   id: int,
   db: AsyncSessionDep,
@@ -65,7 +65,7 @@ async def post_car(
   )
 
 
-@router.put('/{id}', )
+@router.put('/{id}', response_model = dict)
 async def put_car(
   id: int,
   db: AsyncSessionDep,

@@ -35,7 +35,7 @@ async def get_users(
   )
 
 
-@router.get("/{id}", response_model=[UserResponse])
+@router.get("/{id}", response_model=UserResponse)
 async def get_user_by_id(
   id: int,
   db: AsyncSessionDep,
@@ -58,7 +58,7 @@ async def post_user(
   )
 
 
-@router.put('/{id}', )
+@router.put('/{id}',response_model = dict)
 async def put_user(
   id: int,
   db: AsyncSessionDep,

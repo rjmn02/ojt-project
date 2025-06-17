@@ -2,19 +2,19 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
-from backend.dependencies import AsyncSessionDep, get_current_active_user
+from backend.dependencies import get_current_active_user
 from backend.models.sales_transactions import Sales_Transaction
 from backend.models.system_logs import System_Log
 from backend.models.users import User
 from backend.schemas.sales_transactions import SalesTransactionCreate, SalesTransactionEdit
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
 
 async def create_sales_transaction(
-  db: AsyncSessionDep,
+  db: AsyncSession,
   sales_transaction_create: SalesTransactionCreate,
-  current_user: Annotated[User, Depends(get_current_active_user)] 
-
+  current_user: User
 ):
   sales_transaction = Sales_Transaction(
     car_id = sales_transaction_create.car_id,
@@ -44,9 +44,9 @@ async def create_sales_transaction(
     
 
 
-async def get_sales_transaction(
-  db: AsyncSessionDep,
-  current_user: Annotated[User, Depends(get_current_active_user)],
+async def read_sales_transaction(
+  db: AsyncSession,
+  current_user: User,
   offset: int = 0,
   limit: int = 10
 ):
@@ -59,9 +59,9 @@ async def get_sales_transaction(
   result = await db.execute(query)
   return result.scalars().all()
 
-async def get_sales_transaction_by_id(
+async def read_sales_transaction_by_id(
   id: int,
-  db: AsyncSessionDep,
+  db: AsyncSession,
 ):
   query = select(Sales_Transaction).options(
     joinedload(Sales_Transaction.car),
@@ -76,14 +76,14 @@ async def get_sales_transaction_by_id(
 
 async def update_sales_transaction_by_id(
   id: int,
-  db: AsyncSessionDep,
+  db: AsyncSession,
   sales_transaction_edit: SalesTransactionEdit,
-  current_user: Annotated[User, Depends(get_current_active_user)],
+  current_user: User
 ):
             
   try:
     async with db.begin():
-      sales_transaction = await get_sales_transaction_by_id(db, id)
+      sales_transaction = await read_sales_transaction_by_id(db, id)
   
       sales_transaction.car_id = sales_transaction_edit.car_id
       sales_transaction.customer_id = sales_transaction_edit.customer_id

@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Cookie
 from contextlib import asynccontextmanager
 from database import engine
 from models.base import Base  # ADDED IMPORT
 from models import cars, sales_transactions, system_logs, users 
+from routers import cars, login, sales_transactions, system_logs, users
 
 # The first part of the function, before the yield, will be executed before the application starts.
 # And the part after the yield will be executed after the application has finished.
@@ -15,8 +16,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
-
-@app.get('/')
-async def ping():
-  return {'Success': '589725'}
+app.include_router(login.router)
+app.include_router(users.router)
+app.include_router(cars.router)
+app.include_router(sales_transactions.router)
+app.include_router(system_logs.router)

@@ -1,8 +1,7 @@
-from typing import Annotated, List, Optional
-from fastapi import Depends, HTTPException
+from typing import Optional
+from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import String, cast, or_, select
-from backend.dependencies import AsyncSessionDep, get_current_active_user
+from sqlalchemy import or_, select
 from backend.models.cars import Car, CarStatus, FuelType, TransmissionType
 from backend.models.system_logs import System_Log
 from backend.models.users import User
@@ -12,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def create_car(
-    db: AsyncSessionDep,
+    db: AsyncSession,
     car_create: CarCreate,
     current_user: User
 ):
