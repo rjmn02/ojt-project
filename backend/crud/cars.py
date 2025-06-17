@@ -1,11 +1,11 @@
-from typing import Annotated, List, Optional
-from fastapi import Depends, HTTPException
+from typing import Optional
+from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import String, cast, or_, select
+from sqlalchemy import  or_, select
 from models.cars import Car, CarStatus, FuelType, TransmissionType
 from models.system_logs import System_Log
 from models.users import User
-from schemas.cars import CarCreate, CarEdit
+from schemas.cars import CarCreate, CarUpdate
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -41,7 +41,7 @@ async def create_car(
         system_log
       ])
       await db.commit()
-      return {"detail": "Car {car.vin} {car.year} {car.make} {car.model} created successfully"}
+      return {"detail": f"Car {new_car.vin} {new_car.year} {new_car.make} {new_car.model} created successfully"}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
@@ -107,7 +107,7 @@ async def read_car_by_vin(
 async def update_car_by_id(
   id: int,
   db: AsyncSession,
-  car_edit: CarEdit,
+  car_edit: CarUpdate,
   current_user: User
 ):
             
@@ -135,7 +135,7 @@ async def update_car_by_id(
       
       await db.add(system_log)
       await db.commit()
-      return {"detail": "Car {car.vin} {car.year} {car.make} {car.model} updated successfully"}
+      return {"detail": f"Car {car.vin} {car.year} {car.make} {car.model} updated successfully"}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")

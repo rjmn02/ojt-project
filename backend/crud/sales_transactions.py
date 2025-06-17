@@ -1,11 +1,11 @@
-from typing import Annotated
 
-from fastapi import Depends, HTTPException
+
+from fastapi import HTTPException
 from sqlalchemy import select
 from models.sales_transactions import Sales_Transaction
 from models.system_logs import System_Log
 from models.users import User
-from schemas.sales_transactions import SalesTransactionCreate, SalesTransactionEdit
+from schemas.sales_transactions import SalesTransactionCreate, SalesTransactionUpdate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,12 +34,13 @@ async def create_sales_transaction(
         system_log
       ])
       await db.commit()
-      return {"detail": "Sales transaction successfully created."}
+      return {"detail": f"Sales transaction successfully created."}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
   except Exception as e:
-    await db.rollback()  
+    await db.rollback()
+    raise HTTPException(status_code=500, detail=f"An unexpected error occurred. {str(e)}")
     
 
 
@@ -76,7 +77,7 @@ async def read_sales_transaction_by_id(
 async def update_sales_transaction_by_id(
   id: int,
   db: AsyncSession,
-  sales_transaction_edit: SalesTransactionEdit,
+  sales_transaction_edit: SalesTransactionUpdate,
   current_user: User
 ):
             
@@ -97,7 +98,7 @@ async def update_sales_transaction_by_id(
       
       await db.add(system_log)
       await db.commit()
-      return {"detail": "Sales transaction successfully updated."}
+      return {"detail": f"Sales transaction successfully updated."}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")

@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
-from crud.users import get_user_by_email
 from schemas.tokens import TokenData
 from database import get_session
 from datetime import datetime, timedelta, timezone
@@ -36,13 +35,17 @@ def get_password_hash(password):
 
 
 def authenticate_user(db: AsyncSessionDep, email: str, password: str):
-    user = get_user_by_email(db, email)
+    user = read_user_by_email(db, email)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
         return False
     return user
 
+async def read_user_by_email(db: AsyncSessionDep, email: str):
+  query = select(User).where(User.email == email)
+  result = await db.execute(query)
+  return result.scalars().first()
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
@@ -74,7 +77,7 @@ async def get_current_user(
     except InvalidTokenError:
         raise credentials_exception
 
-    user = await get_user_by_email(db=db, email=token_data.email)
+    user = await read_user_by_email(db=db, email=token_data.email)
     if user is None:
         raise credentials_exception
     return user

@@ -3,7 +3,7 @@ from fastapi import  APIRouter, Depends
 from crud.users import create_user, read_user_by_id, read_users, update_user_by_id
 from dependencies import AsyncSessionDep, get_current_active_user
 from models.users import AccountStatus, AccountType, User
-from schemas.users import UserCreate, UserEdit, UserResponse
+from schemas.users import UserCreate, UserUpdate, UserInDB
 
 
 router = APIRouter(
@@ -14,7 +14,7 @@ router = APIRouter(
   ]
 )
 
-@router.get("", response_model = List[UserResponse])
+@router.get("", response_model = List[UserInDB])
 async def get_users(
   db: AsyncSessionDep,
   current_user: Annotated[User, Depends(get_current_active_user)],
@@ -35,7 +35,7 @@ async def get_users(
   )
 
 
-@router.get("/{id}", response_model=UserResponse)
+@router.get("/{id}", response_model=UserInDB)
 async def get_user_by_id(
   id: int,
   db: AsyncSessionDep,
@@ -63,7 +63,7 @@ async def put_user(
   id: int,
   db: AsyncSessionDep,
   current_user: Annotated[User, Depends(get_current_active_user)],
-  user_edit: UserEdit
+  user_edit: UserUpdate
 ):
   
   return await update_user_by_id(

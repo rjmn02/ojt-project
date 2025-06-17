@@ -1,22 +1,18 @@
 from datetime import datetime
-from typing import  Optional
+from typing import  Any, Optional
 from pydantic import BaseModel
-from schemas.users import UserResponse
 
+class SystemLogsBase(BaseModel):
+  user_id: int
+  action: str
+  timestamp: datetime
+class SystemLogCreate(SystemLogsBase):
+  pass
 
-class SystemLogsResponse(BaseModel):
+class SystemLogUpdate(SystemLogsBase):
+  pass
+
+class SystemLogsInDB(SystemLogsBase):
   id: int
-  user_id: int
-  action: str
-  timestamp: datetime
-  user: Optional[UserResponse]
-  
-  model_config = {
-    "from_attributes": True
-  }
-
-
-class SystemLogCreate(BaseModel):
-  user_id: int
-  action: str
-  timestamp: datetime
+  updated_at: datetime
+  user: Optional[Any] = None

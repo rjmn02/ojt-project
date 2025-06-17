@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from dependencies import AsyncSessionDep, get_password_hash
 from models.users import User, AccountStatus, AccountType
 from models.system_logs import System_Log
-from schemas.users import UserCreate, UserEdit
+from schemas.users import UserCreate, UserUpdate
 from sqlalchemy import select, or_
 from typing import Optional
 from sqlalchemy.exc import IntegrityError
@@ -40,7 +40,7 @@ async def create_user(
         system_log
       ])
       await db.commit()
-      return {"detail": "User successfully created."}
+      return {"detail": f"User successfully created."}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
@@ -87,17 +87,11 @@ async def read_user_by_id(
   return result.scalars().first()
 
 
-async def read_user_by_email(db: AsyncSessionDep, email: str):
-  query = select(User).where(User.email == email)
-  result = await db.execute(query)
-  return result.scalars().first()
-
-
 async def update_user_by_id(
   id: int,
   db: AsyncSession,
   current_user: User,
-  user_edit: UserEdit,
+  user_edit: UserUpdate,
 ):          
   try:
     async with db.begin():
@@ -122,7 +116,7 @@ async def update_user_by_id(
       
       await db.add(system_log)
       await db.commit()
-      return {"detail": "User successfully updated."}
+      return {"detail": f"User successfully updated."}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")

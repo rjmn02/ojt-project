@@ -4,8 +4,7 @@ from crud.cars import create_car, read_car_by_id, read_cars, update_car_by_id
 from dependencies import AsyncSessionDep, get_current_active_user
 from models.cars import CarStatus, FuelType, TransmissionType
 from models.users import User
-from schemas.cars import CarCreate, CarEdit, CarResponse
-from schemas.users import UserResponse
+from schemas.cars import CarCreate, CarUpdate, CarInDB
 
 
 router = APIRouter(
@@ -16,7 +15,7 @@ router = APIRouter(
   ]
 )
 
-@router.get("", response_model = List[CarResponse])
+@router.get("", response_model = List[CarInDB])
 async def get_cars(
   db: AsyncSessionDep,
   current_user: Annotated[User, Depends(get_current_active_user)],
@@ -41,7 +40,7 @@ async def get_cars(
   )
 
 
-@router.get("/{id}", response_model=CarResponse)
+@router.get("/{id}", response_model=CarInDB)
 async def get_car_by_id(
   id: int,
   db: AsyncSessionDep,
@@ -69,7 +68,7 @@ async def post_car(
 async def put_car(
   id: int,
   db: AsyncSessionDep,
-  car_edit: CarEdit,
+  car_edit: CarUpdate,
   current_user: Annotated[User, Depends(get_current_active_user)]
 ):
   

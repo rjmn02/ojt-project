@@ -3,7 +3,7 @@ from fastapi import  APIRouter, Depends
 from crud.system_logs import read_system_logs
 from dependencies import AsyncSessionDep, get_current_active_user
 from models.users import User
-from schemas.system_logs import SystemLogsResponse
+from schemas.system_logs import SystemLogsInDB
 
 
 router = APIRouter(
@@ -14,7 +14,7 @@ router = APIRouter(
   ]
 )
 
-@router.get("", response_model = List[SystemLogsResponse])
+@router.get("", response_model = List[SystemLogsInDB])
 async def get_system_logs(
   db: AsyncSessionDep,
   current_user:  Annotated[User, Depends(get_current_active_user)],

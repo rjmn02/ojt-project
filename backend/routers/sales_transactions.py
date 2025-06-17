@@ -1,13 +1,9 @@
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 from fastapi import  APIRouter, Depends
-from crud.cars import create_car, read_car_by_id, read_cars, update_car_by_id
-from crud.sales_transactions import create_sales_transaction, read_sales_transaction, read_sales_transaction_by_id
+from crud.sales_transactions import create_sales_transaction, read_sales_transaction, read_sales_transaction_by_id, update_sales_transaction_by_id
 from dependencies import AsyncSessionDep, get_current_active_user
-from models.cars import CarStatus, FuelType, TransmissionType
 from models.users import User
-from schemas.cars import CarCreate, CarEdit, CarResponse
-from schemas.sales_transactions import SalesTransactionCreate, SalesTransactionEdit, SalesTransactionResponse
-from schemas.users import UserResponse
+from schemas.sales_transactions import SalesTransactionCreate, SalesTransactionUpdate, SalesTransactionInDB
 
 
 router = APIRouter(
@@ -18,7 +14,7 @@ router = APIRouter(
   ]
 )
 
-@router.get("", response_model = List[SalesTransactionResponse])
+@router.get("", response_model = List[SalesTransactionInDB])
 async def get_sales_transactions(
   db: AsyncSessionDep,
   current_user: Annotated[User, Depends(get_current_active_user)],
@@ -33,7 +29,7 @@ async def get_sales_transactions(
   ) 
 
 
-@router.get("/{id}", response_model=SalesTransactionResponse)
+@router.get("/{id}", response_model=SalesTransactionInDB)
 async def get_sales_transaction_by_id(
   id: int,
   db: AsyncSessionDep,
@@ -61,11 +57,11 @@ async def post_sales_transaction(
 async def put_sales_transaction(
   id: int,
   db: AsyncSessionDep,
-  sales_transaction_edit: SalesTransactionEdit,
+  sales_transaction_edit: SalesTransactionUpdate,
   current_user: Annotated[User, Depends(get_current_active_user)]
 ):
   
-  return await update_car_by_id(
+  return await update_sales_transaction_by_id(
     id=id,
     db=db,
     sales_transaction_edit=sales_transaction_edit,
