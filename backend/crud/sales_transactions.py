@@ -1,7 +1,7 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import Depends, HTTPException
-from sqlalchemy import or_, select
+from sqlalchemy import select
 from backend.dependencies import AsyncSessionDep, get_current_active_user
 from backend.models.sales_transactions import Sales_Transaction
 from backend.models.system_logs import System_Log

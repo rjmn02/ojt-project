@@ -7,13 +7,14 @@ from backend.models.cars import Car, CarStatus, FuelType, TransmissionType
 from backend.models.system_logs import System_Log
 from backend.models.users import User
 from backend.schemas.cars import CarCreate, CarEdit
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 
 async def create_car(
     db: AsyncSessionDep,
     car_create: CarCreate,
-    current_user: Annotated[User, Depends(get_current_active_user)] 
-
+    current_user: User
 ):
   new_car = Car(
     vin = car_create.vin,
@@ -50,9 +51,9 @@ async def create_car(
     raise HTTPException(status_code=500, detail=f"An unexpected error occurred. {str(e)}")
 
 
-async def get_cars(
-  db: AsyncSessionDep,
-  current_user: Annotated[User, Depends(get_current_active_user)],
+async def read_cars(
+  db: AsyncSession,
+  current_user: User,
   offset: int = 0,
   limit: int = 10,
   year: Optional[int] = None,
@@ -86,18 +87,18 @@ async def get_cars(
   return result.scalars().all()
 
 
-async def get_car_by_id(
+async def read_car_by_id(
   id: int,
-  db: AsyncSessionDep,
+  db: AsyncSession,
 ):
   query = select(Car).where(Car.id == id)
   result = await db.execute(query)
   return result.scalars().first()
 
 
-async def get_car_by_vin(
+async def read_car_by_vin(
   vin: str,
-  db: AsyncSessionDep,
+  db: AsyncSession,
 ):
   query = select(Car).where(Car.vin == vin)
   result = await db.execute(query)
@@ -106,14 +107,14 @@ async def get_car_by_vin(
 
 async def update_car_by_id(
   id: int,
-  db: AsyncSessionDep,
+  db: AsyncSession,
   car_edit: CarEdit,
-  current_user: Annotated[User, Depends(get_current_active_user)],
+  current_user: User
 ):
             
   try:
     async with db.begin():
-      car = await get_car_by_id(db, id)
+      car = await read_car_by_id(db, id)
   
       car.vin = car_edit.vin,
       car.make = car_edit.make.upper(),

@@ -1,17 +1,18 @@
-from fastapi import Depends, HTTPException
-from dependencies import AsyncSessionDep, get_current_active_user, get_password_hash
+from fastapi import HTTPException
+from dependencies import AsyncSessionDep, get_password_hash
 from models.users import User, AccountStatus, AccountType
 from models.system_logs import System_Log
 from schemas.users import UserCreate, UserEdit
 from sqlalchemy import select, or_
-from typing import Annotated, Optional
+from typing import Optional
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def create_user(
-    db: AsyncSessionDep,
-    user_create: UserCreate,
-    current_user: Annotated[User, Depends(get_current_active_user)] 
+  db: AsyncSession,
+  current_user: User,
+  user_create: UserCreate,
 ):
   new_user = User(
     # Information
@@ -48,9 +49,9 @@ async def create_user(
     raise HTTPException(status_code=500, detail=f"An unexpected error occurred. {str(e)}")
 
 
-async def get_users(
-  db: AsyncSessionDep,
-  current_user: Annotated[User, Depends(get_current_active_user)],
+async def read_users(
+  db: AsyncSession,
+  current_user: User,
   offset: int = 0,
   limit: int = 10,
   type: Optional[AccountType] = None,
@@ -77,16 +78,16 @@ async def get_users(
   return result.scalars().all()
 
 
-async def get_user_by_id(
+async def read_user_by_id(
   id: int,
-  db: AsyncSessionDep,
+  db: AsyncSession,
 ):
   query = select(User).where(User.id == id)
   result = await db.execute(query)
   return result.scalars().first()
 
 
-async def get_user_by_email(db: AsyncSessionDep, email: str):
+async def read_user_by_email(db: AsyncSessionDep, email: str):
   query = select(User).where(User.email == email)
   result = await db.execute(query)
   return result.scalars().first()
@@ -94,13 +95,13 @@ async def get_user_by_email(db: AsyncSessionDep, email: str):
 
 async def update_user_by_id(
   id: int,
-  db: AsyncSessionDep,
+  db: AsyncSession,
+  current_user: User,
   user_edit: UserEdit,
-  current_user: Annotated[User, Depends(get_current_active_user)]
 ):          
   try:
     async with db.begin():
-      user = await get_user_by_id(db, id)
+      user = await read_user_by_id(db, id)
       
       # Information
       user.firstname=user_edit.firstname.upper()
