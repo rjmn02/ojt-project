@@ -22,6 +22,15 @@ class Sales_Transaction(Base):
     created_by: Mapped[str] = mapped_column(String(155))
     updated_by: Mapped[str] = mapped_column(String(155))
 
-    car: Mapped["Car"] = relationship(back_populates="sale_transaction")
-    customer: Mapped["User"] = relationship(back_populates="sales_as_customer", foreign_keys=[customer_id])
-    agent: Mapped["User"] = relationship(back_populates="sales_as_agent", foreign_keys=[agent_id])
+    car: Mapped["Car"] = relationship(
+      back_populates="sale_transaction",
+      foreign_keys=[car_id]
+    )
+    customer: Mapped["User"] = relationship(
+      back_populates="sales_as_customer",
+      foreign_keys=[customer_id]
+    )
+    agent: Mapped["User"] = relationship(
+      back_populates="sales_as_agent",
+      foreign_keys=[agent_id]
+    )

@@ -39,6 +39,18 @@ class User(Base):
   updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
   # Relationships
-  logs: Mapped[List["System_Log"]] = relationship(back_populates="user")
-  sales_as_customer: Mapped[List["Sales_Transaction"]] = relationship(back_populates="customer", cascade="all, delete")
-  sales_as_agent: Mapped[List["Sales_Transaction"]] = relationship(back_populates="agent", cascade="all, delete")
+  logs: Mapped[List["System_Log"]] = relationship(
+    back_populates="user"
+  )
+    
+  sales_as_customer: Mapped[List["Sales_Transaction"]] = relationship(
+    back_populates="customer",
+    foreign_keys="[Sales_Transaction.customer_id]",
+    cascade="all, delete"
+  )
+  
+  sales_as_agent: Mapped[List["Sales_Transaction"]] = relationship(
+    back_populates="agent", 
+    foreign_keys="[Sales_Transaction.agent_id]",
+    cascade="all, delete"
+  )

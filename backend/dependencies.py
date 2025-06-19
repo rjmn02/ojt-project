@@ -34,11 +34,11 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(db: AsyncSessionDep, email: str, password: str):
-    user = read_user_by_email(db, email)
+async def authenticate_user(db: AsyncSessionDep, email: str, password: str):
+    user = await read_user_by_email(db, email)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 

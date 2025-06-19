@@ -14,12 +14,20 @@ async def create_user(
   current_user: User,
   user_create: UserCreate,
 ):
+  
+  existing_user = await db.select(User).filter(User.email == user_create.email).first()
+  if existing_user:
+    raise HTTPException(
+      status_code=400,
+      detail="Email already registered"
+    )
+    
   new_user = User(
     # Information
     firstname=user_create.firstname.upper(),
-    middlename=user_create.middlename.upper(),
+    middlename=user_create.middlename.upper() if user_create.middlename else None,
     lastname=user_create.lastname.upper(),
-    contact_num=user_create.contact_num,
+    contact_num=user_create.contact_num if user_create.contact_num else None,
     # Credentials
     email=user_create.email,
     password=get_password_hash(user_create.password),
