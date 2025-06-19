@@ -7,6 +7,7 @@ from sqlalchemy import select, or_
 from typing import Optional
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 
 async def create_user(
@@ -42,13 +43,12 @@ async def create_user(
   )
   
   try:
-    async with db.begin():
-      await db.add_all([
-        new_user, 
-        system_log
-      ])
-      await db.commit()
-      return {"detail": f"User successfully created."}
+    db.add_all([
+      new_user, 
+      system_log
+    ])
+    await db.commit()
+    return {"detail": f"User successfully created."}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
@@ -66,24 +66,31 @@ async def read_users(
   status: Optional[AccountStatus] = None,
   search: Optional[str] = None
 ):
-  
-  query = select(User)
-  if type:
-      query = query.where(User.type == type)
-  if status:
-      query = query.where(User.status == status)
-  if search:
-    query = query.where(
-      or_(
-        User.firstname.ilike(f"%{search}%"),
-        User.middlename.ilike(f"%{search}%"),
-        User.lastname.ilike(f"%{search}%"),
-        User.email.ilike(f"%{search}%"),
+  try:
+    query = select(User)
+      
+    if type:
+        query = query.where(User.type == type)
+    if status:
+        query = query.where(User.status == status)
+    if search:
+      query = query.where(
+        or_(
+          User.firstname.ilike(f"%{search}%"),
+          User.middlename.ilike(f"%{search}%"),
+          User.lastname.ilike(f"%{search}%"),
+          User.email.ilike(f"%{search}%"),
+        )
       )
-    )
-  query = query.offset(offset).limit(limit)
-  result = await db.execute(query)
-  return result.scalars().all()
+    query = query.offset(offset).limit(limit)
+    result = await db.execute(query)
+    return result.scalars().all()
+  
+  except Exception as e:
+      raise HTTPException(
+          status_code=500,
+          detail=f"Error retrieving users: {str(e)}"
+      )
 
 
 async def read_user_by_id(
@@ -102,29 +109,29 @@ async def update_user_by_id(
   user_edit: UserUpdate,
 ):          
   try:
-    async with db.begin():
-      user = await read_user_by_id(db, id)
-      
-      # Information
-      user.firstname=user_edit.firstname.upper()
-      user.middlename=user_edit.middlename.upper()
-      user.lastname=user_edit.lastname.upper()
-      user.contact_num=user_edit.contact_num
-      # Credentials
-      user.email=user_edit.email
-      user.password=get_password_hash(user_edit.password)
-      # Account details
-      user.type=user_edit.type
-      user.status=user_edit.status
-      
-      system_log = System_Log(
-        action=f"User {user.email} updated successfully.",
-        user_id=current_user.id
-      )
-      
-      await db.add(system_log)
-      await db.commit()
-      return {"detail": f"User successfully updated."}
+    user = await read_user_by_id(id=id, db=db)
+    
+    # Information
+    user.firstname=user_edit.firstname.upper()
+    user.middlename=user_edit.middlename.upper()
+    user.lastname=user_edit.lastname.upper()
+    user.contact_num=user_edit.contact_num
+    # Credentials
+    user.email=user_edit.email
+    if user_edit.password:
+      user.password = get_password_hash(user_edit.password)
+    # Account details
+    user.type=user_edit.type
+    user.status=user_edit.status
+    
+    system_log = System_Log(
+      action=f"User {user.email} updated successfully.",
+      user_id=current_user.id
+    )
+    
+    db.add(system_log)
+    await db.commit()
+    return {"detail": f"User successfully updated."}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")

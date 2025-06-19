@@ -1,6 +1,7 @@
 
 from datetime import timedelta
 from fastapi import  APIRouter, HTTPException, Response
+from sqlalchemy import select
 from crud.users import create_user
 from models.users import User
 from models.system_logs import System_Log
@@ -58,8 +59,13 @@ async def login_for_access_token(
         key="access_token",
         value=access_token,
         httponly=True,  # Prevents JavaScript access
-        secure=True,    # Only sent over HTTPS
-        samesite="lax", # CSRF protection
+        # PRODUCTION
+        #samesite="lax", 
+        #secure=True, 
+        
+        # DEV
+        samesite="none", 
+        secure=True,    
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60  # Convert minutes to seconds
       )
       
@@ -96,11 +102,12 @@ async def register_user(
     action=f"User {register.email} registered successfully.",
     user_id=0
   )
-  
+  check_existing_user_query = select(User).filter(User.email == register.email)
   try:
     async with db.begin():
       
-      existing_user = await db.select(User).filter(User.email == register.email).first()
+      result = await db.execute(check_existing_user_query)
+      existing_user = result.scalar_one_or_none()
       if existing_user:
         raise HTTPException(
           status_code=400,
@@ -110,8 +117,8 @@ async def register_user(
       await db.flush()
       
       system_log = System_Log(
-        action=f"User {register.email} registered successfully.",
-        user_id=0
+        action=f"User {new_user.email} registered successfully.",
+        user_id=new_user.id
       )
       db.add(system_log)
       await db.commit()

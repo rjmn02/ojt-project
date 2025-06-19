@@ -28,6 +28,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
   email: str
+  password: Optional[str] = None
   
   firstname: str
   middlename: Optional[str] = None
@@ -41,10 +42,6 @@ class UserInDB(UserBase):
   id: int
   created_at: datetime
   updated_at: datetime
-
-  logs: Optional[Any] = None
-  sales_as_customer: Optional[Any] = None
-  sales_as_agent: Optional[Any] = None
   
   model_config = {
     "from_attributes": True

@@ -15,4 +15,3 @@ class SystemLogUpdate(SystemLogsBase):
 class SystemLogsInDB(SystemLogsBase):
   id: int
   updated_at: datetime
-  user: Optional[Any] = None

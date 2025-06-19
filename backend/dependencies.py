@@ -1,11 +1,12 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
+from models.users import AccountStatus, AccountType
 from schemas.tokens import TokenData
 from database import get_session
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import APIKeyCookie
 from models.users import User
 import jwt
 import os
@@ -19,12 +20,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-# DB
+# ASYNC DB SESSION
 AsyncSessionDep = Annotated[AsyncSession, Depends(get_session)]
-# DB
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+cookie_scheme = APIKeyCookie(name="access_token", auto_error=True)
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -59,7 +59,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: Annotated[str, Depends(cookie_scheme)],
     db: AsyncSessionDep,
 ):
     """Validate the JWT token and fetch the current user."""
@@ -87,6 +87,6 @@ async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
     """Ensure the current user is active."""
-    if current_user.status != "ACTIVE":
+    if current_user.status != AccountStatus.ACTIVE:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

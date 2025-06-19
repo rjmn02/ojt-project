@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, List, Optional
 from pydantic import BaseModel
 
 class SalesTransactionBase(BaseModel):
@@ -23,10 +23,6 @@ class SalesTransactionInDB(SalesTransactionBase):
   updated_at: datetime
   created_by: str
   updated_by: str
-  
-  car: Optional[Any] = None
-  customer: Optional[Any] = None
-  agent: Optional[Any] = None
 
   model_config = {
     "from_attributes": True

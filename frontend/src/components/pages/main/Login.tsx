@@ -36,14 +36,15 @@ const Login = () => {
 
   const onSubmit = async(values: z.infer<typeof formSchema>) => {
     axios
-      .post(`${import.meta.env.VITE_API_URL}/api/login`, values, {
+      .post(`${import.meta.env.VITE_API_URL}/auth/login`, values, {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
+        withCredentials: true,
       })
       .then((response) => {
-        localStorage.setItem("access_token", response.data.access_token);
-        form.reset();
+        console.log(response);
+        // form.reset();
         navigate("/");
       })
       .catch((error) => {
@@ -53,16 +54,6 @@ const Login = () => {
 
   useEffect(() => {
     document.title = "Login Page"
-    const token = localStorage.getItem("access_token");
-
-    if(token) {
-      const payloadBase64 = token.split('.')[1];
-      const decodedPayload = JSON.parse(atob(payloadBase64));
-      const isExpired = decodedPayload.exp && decodedPayload.exp * 1000 < Date.now();
-      if (!isExpired) {
-        navigate("/");
-      }
-    }
   }, [])
 
   return (

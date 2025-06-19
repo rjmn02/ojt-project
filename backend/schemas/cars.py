@@ -32,7 +32,7 @@ class CarBase(BaseModel):
   status: CarStatus = CarStatus.AVAILABLE
 
 class CarCreate(CarBase):
-  created_by: str
+  pass
 
 class CarUpdate(CarBase):
   vin: Optional[str] = None
@@ -45,8 +45,6 @@ class CarUpdate(CarBase):
   transmission_type: Optional[TransmissionType] = None
   fuel_type: Optional[FuelType] = None
   status: Optional[CarStatus] = None
-  
-  updated_by: str
 
 class CarInDB(CarBase):
   id: int
@@ -54,8 +52,6 @@ class CarInDB(CarBase):
   updated_at: datetime
   created_by: str
   updated_by: str
-  
-  sale_transaction: Optional[Any]
 
   model_config = {
     "from_attributes": True

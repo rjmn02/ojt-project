@@ -26,7 +26,8 @@ async def create_car(
     transmission_type = car_create.transmission_type,
     fuel_type = car_create.fuel_type,
     
-    created_by = current_user.id
+    created_by = current_user.email,
+    updated_by = current_user.email
   )
   
   system_log = System_Log(
@@ -35,13 +36,12 @@ async def create_car(
   )
   
   try:
-    async with db.begin():
-      await db.add_all([
-        new_car, 
-        system_log
-      ])
-      await db.commit()
-      return {"detail": f"Car {new_car.vin} {new_car.year} {new_car.make} {new_car.model} created successfully"}
+    db.add_all([
+      new_car, 
+      system_log
+    ])
+    await db.commit()
+    return {"detail": f"Car {new_car.vin} {new_car.year} {new_car.make} {new_car.model} created successfully"}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
@@ -112,30 +112,29 @@ async def update_car_by_id(
 ):
             
   try:
-    async with db.begin():
-      car = await read_car_by_id(db, id)
-  
-      car.vin = car_edit.vin,
-      car.make = car_edit.make.upper(),
-      car.model = car_edit.model.upper(),
-      car.year = car_edit.year,
-      car.color = car_edit.color.upper(),
-      car.mileage = car_edit.mileage,
-      car.price = car_edit.price,
-      car.transmission_type = car_edit.transmission_type,
-      car.fuel_type = car_edit.fuel_type
-      
-      car.updated_by = current_user.id
-      
-      
-      system_log = System_Log(
-        action=f"User {current_user.id} updated car {car.vin}",
-        user_id=current_user.id,
-      )
-      
-      await db.add(system_log)
-      await db.commit()
-      return {"detail": f"Car {car.vin} {car.year} {car.make} {car.model} updated successfully"}
+    car = await read_car_by_id(id=id, db=db)
+
+    car.vin = car_edit.vin
+    car.make = car_edit.make.upper()
+    car.model = car_edit.model.upper()
+    car.year = car_edit.year
+    car.color = car_edit.color.upper()
+    car.mileage = car_edit.mileage
+    car.price = car_edit.price
+    car.transmission_type = car_edit.transmission_type
+    car.fuel_type = car_edit.fuel_type
+    
+    car.updated_by = current_user.email
+    
+    
+    system_log = System_Log(
+      action=f"User {current_user.id} updated car {car.vin}",
+      user_id=current_user.id,
+    )
+    
+    db.add(system_log)
+    await db.commit()
+    return {"detail": f"Car {car.vin} {car.year} {car.make} {car.model} updated successfully"}
   except IntegrityError as e:
     await db.rollback()  
     raise HTTPException(status_code=400, detail=f"Database integrity error. {str(e)}")
