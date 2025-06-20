@@ -14,7 +14,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import axios from "axios"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 
 const formSchema = z.object({
@@ -36,7 +36,7 @@ const Login = () => {
 
   const onSubmit = async(values: z.infer<typeof formSchema>) => {
     axios
-      .post(`${import.meta.env.VITE_API_URL}/auth/login`, values, {
+      .post('/auth/login', values, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -44,8 +44,7 @@ const Login = () => {
       })
       .then((response) => {
         console.log(response);
-        // form.reset();
-        navigate("/");
+        form.reset();
       })
       .catch((error) => {
         console.error("Error creating item:", error);
@@ -93,10 +92,14 @@ const Login = () => {
                 )}
               />
             </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full mt-4">
+            <CardFooter className="grid grid-cols-1 grid-rows-3 mt-5">
+              <Button type="submit" className="w-full">
                 Login
               </Button>
+              <p className="text-center text-sm text-muted-foreground">or</p>
+              <Button variant={"outline"} className="w-full" onClick={() => {navigate('/register')}}>
+                Register
+              </Button>        
             </CardFooter>
           </form>
         </Form>

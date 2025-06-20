@@ -11,11 +11,15 @@ import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './components/pages/main/MainPage';
 import SystemLogs from './components/pages/main/SystemLogs';
 import Users from './components/pages/main/Users';
+import Register from './components/pages/main/Register';
 
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <>
+            <Route path='/register' element={
+                <Register/>
+            }/>
             <Route path='/login' element={
                 <Login/>
             }/>

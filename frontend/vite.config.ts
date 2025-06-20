@@ -11,4 +11,18 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'), // Adjust if your root isn't ./src
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/auth': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

@@ -1,11 +1,14 @@
 from fastapi import FastAPI, Cookie
 from contextlib import asynccontextmanager
-
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select
 from database import engine
 from models.base import Base  # ADDED IMPORT
 from routers import cars, auth, sales_transactions, system_logs, users
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
+from dependencies import get_password_hash
+from models.users import User, AccountType, AccountStatus
 
 # The first part of the function, before the yield, will be executed before the application starts.
 # And the part after the yield will be executed after the application has finished.
@@ -22,6 +25,8 @@ app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:5173",
+    "http://127.0.0.1:8000",
+    
   ]
 
 app.add_middleware(
@@ -39,11 +44,8 @@ app.include_router(cars.router)
 app.include_router(sales_transactions.router)
 app.include_router(system_logs.router)
 
+# app.mount("/", StaticFiles(directory="D:/Projects/ojt-project/frontend/dist", html=True), name="static")
 
-from datetime import datetime
-from sqlalchemy.ext.asyncio import AsyncSession
-from dependencies import get_password_hash
-from models.users import User, AccountType, AccountStatus
 
 async def initialize_admin_user():
   async with engine.begin() as conn:
