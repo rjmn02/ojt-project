@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import { toast, Toaster } from "sonner"
 
 
 const formSchema = z.object({
@@ -43,12 +44,12 @@ const Login = () => {
         withCredentials: true,
       })
       .then((response) => {
-        console.log(response);
         form.reset();
-        navigate('/')
+        navigate('/');
       })
       .catch((error) => {
-        console.error("Error creating item:", error);
+        const message = error.response.data.detail || 'Unexpected error'
+        toast.error(message);
       });
   }
 
@@ -58,6 +59,7 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
+      <Toaster />
       <Card className="w-[450px]">
         <CardHeader>
           <CardTitle className="text-3xl">Login</CardTitle>

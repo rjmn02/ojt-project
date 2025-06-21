@@ -8,7 +8,6 @@ from models.users import User
 from models.system_logs import System_Log
 from dependencies import ACCESS_TOKEN_EXPIRE_MINUTES, AsyncSessionDep, authenticate_user, create_access_token, get_current_active_user, get_password_hash
 from schemas.auth import LoginRequest, Register
-from schemas.tokens import Token
 from sqlalchemy.exc import IntegrityError
 
 

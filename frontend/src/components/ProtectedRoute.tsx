@@ -1,35 +1,37 @@
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import type { AccountType } from "@/lib/types";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProtectedRoute = ({
   children,
-  allowedRoles,
+  allowedUsers,
 }: {
   children: React.ReactNode;
-  allowedRoles?: string[];
+  allowedUsers: string[];
 }) => {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [unauthorized, setUnauthorized] = useState(false);
+  const [authorized, setAuthorized] = useState<boolean | null>(null); // null = loading
 
+  const navigate = useNavigate()
   useEffect(() => {
     axios
-      .get("/auth/me", { withCredentials: true })
+      .get('/auth/me', { withCredentials: true })
       .then((res) => {
-        const user = res.data;
-        if (allowedRoles && !allowedRoles.includes(user.type)) {
-          setUnauthorized(true);
-        } else {
-          setUser(user);
-        }
+        setAuthorized(allowedUsers.includes(res.data.type as AccountType));
       })
-      .catch(() => setUnauthorized(true))
-      .finally(() => setLoading(false));
-  }, [allowedRoles]);
+      .catch((error) => {
+        console.error("Error fetching user type:", error);
+        setAuthorized(false);
+      });
+  }, [allowedUsers]);
 
-  if (loading) return <div>Loading...</div>;
-  if (unauthorized) return <Navigate to="/login" replace />;
+  if (authorized === null) {
+    return <div>Loading...</div>;
+  }
+
+  if (!authorized) {
+    navigate('/login')
+  }
 
   return <>{children}</>;
 };

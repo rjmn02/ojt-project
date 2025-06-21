@@ -12,11 +12,6 @@ const Header = () => {
             </a>
           </li>
           <li>
-            <a href="/items" className="hover:underline">
-              Items
-            </a>
-          </li>
-          <li>
             <a href="/users" className="hover:underline">
               Users
             </a>

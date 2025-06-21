@@ -8,9 +8,10 @@ import { ThemeProvider } from './components/theme-provider';
 import Body from './components/pages/layout/Body';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './components/pages/main/MainPage';
-import SystemLogs from './components/pages/main/SystemLogs';
-import Users from './components/pages/main/Users';
+import Users from './components/pages/main/Users/UsersPage';
 import Register from './components/pages/main/Register';
+import SystemLogsPage from './components/pages/main/SystemLogs/SystemLogsPage';
+import UsersPage from './components/pages/main/Users/UsersPage';
 
 
 const router = createBrowserRouter(
@@ -24,18 +25,18 @@ const router = createBrowserRouter(
             }/>
             
             <Route path='/' element={
-              <ProtectedRoute allowedRoles={["AGENT", 'CLIENT']} >
+              <ProtectedRoute allowedUsers={['ADMIN', 'AGENT', 'CLIENT']}>
                   <Body element={<MainPage />} />
               </ProtectedRoute>
-              } />\
+              } />
             <Route path='/system-logs' element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                  <Body element={<SystemLogs />} />
+              <ProtectedRoute allowedUsers={['ADMIN']}>
+                  <Body element={<SystemLogsPage />} />
               </ProtectedRoute>
               } />
             <Route path='/users' element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
-                  <Body element={<Users />} />
+              <ProtectedRoute allowedUsers={['ADMIN']}>
+                  <Body element={<UsersPage />} />
               </ProtectedRoute>
               } />
       </>

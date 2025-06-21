@@ -10,18 +10,11 @@ export interface Item {
 
 export interface SystemLog {
   id: number;
-  description: string;
   user_id: number;
-  created_by: string;
-  created_date: string;
-
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    logs: any[];
-  };
-}
+  action: string;
+  timestamp: string;
+  updated_at: string;   
+} 
 
 
 export interface User {
@@ -32,19 +25,40 @@ export interface User {
   email: string;
   password: string;
   contact_num: string;
-  account_type: string;
+  type: string;
   status: string;
   created_by: string;
-  updated_by:string;
-  created_date: Date;
-  updated_date: Date;
+  updated_by: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+
+export enum TransmissionType {
+  MANUAL = "MANUAL",
+  AUTOMATIC = "AUTOMATIC"
+}
+
+export enum FuelType {
+  PETROL = "PETROL",
+  DIESEL = "DIESEL",
+  ELECTRIC = "ELECTRIC",
+  HYBRID = "HYBRID"
+}
+
+export enum CarStatus {
+  AVAILABLE = "AVAILABLE",
+  SOLD = "SOLD",
+  RESERVED = "RESERVED"
 }
 
 export enum AccountType {
-  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
+  AGENT = "AGENT",
+  CLIENT = "CLIENT"
 }
 
 export enum AccountStatus {
   ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
+  INACTIVE = "INACTIVE"
 }

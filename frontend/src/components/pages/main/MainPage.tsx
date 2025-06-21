@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
+
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const MainPage = () => {
-  const navigate = useNavigate()
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get('/auth/me', { withCredentials: true })
-      .then(res => {
+    axios
+      .get('/auth/me', { withCredentials: true })
+      .then((res) => {
         setEmail(res.data.email);
       })
-      .catch(err => {
-        console.error("Error fetching user info", err);
+      .catch((error) => {
+        console.error("Error fetching user email:", error);
       });
   }, []);
 

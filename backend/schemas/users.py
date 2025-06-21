@@ -15,7 +15,7 @@ class UserBase(BaseModel):
   email: str
   
   firstname: str
-  middlename: str
+  middlename: Optional[str] = None 
   lastname: str
   contact_num: str
 

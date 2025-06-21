@@ -21,11 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
+import { AccountType } from "@/lib/types";
 
-enum RegAccountType {
-  AGENT = "AGENT",
-}
 
 
 const formSchema = z.object({
@@ -54,7 +52,7 @@ const Register = () => {
       lastname: "",
       contact_num: "",
 
-      type: RegAccountType.AGENT,
+      type: AccountType.AGENT,
     },
   });
 
@@ -203,7 +201,8 @@ const Register = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={"AGENT" as RegAccountType.AGENT}>AGENT</SelectItem>
+                      <SelectItem value={"AGENT" as AccountType.AGENT}>AGENT</SelectItem>
+                      <SelectItem value={"CLIENT" as AccountType.CLIENT}>CLIENT</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

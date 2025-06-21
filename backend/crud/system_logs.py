@@ -13,7 +13,7 @@ async def read_system_logs(
   search: Optional[str] = None,
 
 ):
-  query = select(System_Log).offset(offset).limit(limit)
+  query = select(System_Log).order_by(System_Log.id.desc()).offset(offset).limit(limit)
   if search:
     query = query.where(
       or_(

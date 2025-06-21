@@ -21,6 +21,7 @@ const LogoutButton = () => {
         console.error("Error creating item:", error);
       });
   }
+
   return (
     <Button
       variant="destructive"
