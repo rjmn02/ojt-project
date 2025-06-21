@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token"); // should be "token" if that's what you're storing
-    if (!token) return;
-
-    try {
-      const payloadBase64 = token.split('.')[1];
-      const decodedPayload = JSON.parse(atob(payloadBase64));
-      setEmail(decodedPayload.sub); // "sub" is the user's email in your token
-    } catch (error) {
-      console.error("Invalid token", error);
-    }
+    axios.get('/auth/me', { withCredentials: true })
+      .then(res => {
+        setEmail(res.data.email);
+      })
+      .catch(err => {
+        console.error("Error fetching user info", err);
+      });
   }, []);
 
   return (

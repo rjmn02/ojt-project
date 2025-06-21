@@ -6,7 +6,6 @@ import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} fr
 import Login from './components/pages/main/Login';
 import { ThemeProvider } from './components/theme-provider';
 import Body from './components/pages/layout/Body';
-import Items from './components/pages/main/Items';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainPage from './components/pages/main/MainPage';
 import SystemLogs from './components/pages/main/SystemLogs';
@@ -25,22 +24,17 @@ const router = createBrowserRouter(
             }/>
             
             <Route path='/' element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["AGENT", 'CLIENT']} >
                   <Body element={<MainPage />} />
               </ProtectedRoute>
-              } />
-            <Route path='/items' element={
-              <ProtectedRoute>
-                  <Body element={<Items />} />
-              </ProtectedRoute>
-              } />
+              } />\
             <Route path='/system-logs' element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
                   <Body element={<SystemLogs />} />
               </ProtectedRoute>
               } />
             <Route path='/users' element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
                   <Body element={<Users />} />
               </ProtectedRoute>
               } />

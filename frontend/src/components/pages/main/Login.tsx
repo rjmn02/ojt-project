@@ -34,7 +34,7 @@ const Login = () => {
     },
   })
 
-  const onSubmit = async(values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     axios
       .post('/auth/login', values, {
         headers: {
@@ -45,6 +45,7 @@ const Login = () => {
       .then((response) => {
         console.log(response);
         form.reset();
+        navigate('/')
       })
       .catch((error) => {
         console.error("Error creating item:", error);

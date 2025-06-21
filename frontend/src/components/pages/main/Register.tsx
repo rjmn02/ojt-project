@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 enum RegAccountType {
   AGENT = "AGENT",
@@ -33,13 +34,15 @@ const formSchema = z.object({
 
   firstname: z.string().min(1, "Firstname is required"),
   middlename: z.string(),
-  lastname: z.string().min(1, "Firstname is required"),
+  lastname: z.string().min(1, "Lastname is required"),
   contact_num: z.string().min(1, "Contact number is required"),
 
   type: z.enum(["AGENT", "CLIENT"]),
 });
 
 const Register = () => {
+  const navigate = useNavigate()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,7 +58,7 @@ const Register = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     axios
       .post('/auth/register', values, {
         headers: {
@@ -65,7 +68,8 @@ const Register = () => {
       })
       .then((response) => {
         console.log(response);
-        // form.reset();
+        form.reset();
+        navigate('/')
       })
       .catch((error) => {
         console.error("Error registering:", error);

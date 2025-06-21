@@ -1,15 +1,15 @@
 
 from datetime import timedelta
-from fastapi import  APIRouter, HTTPException, Response
+from typing import Annotated
+from fastapi import  APIRouter, Depends, HTTPException, Response
 from sqlalchemy import select
-from crud.users import create_user
+from schemas.users import UserInDB
 from models.users import User
 from models.system_logs import System_Log
-from dependencies import ACCESS_TOKEN_EXPIRE_MINUTES, AsyncSessionDep, authenticate_user, create_access_token, get_password_hash
+from dependencies import ACCESS_TOKEN_EXPIRE_MINUTES, AsyncSessionDep, authenticate_user, create_access_token, get_current_active_user, get_password_hash
 from schemas.auth import LoginRequest, Register
 from schemas.tokens import Token
 from sqlalchemy.exc import IntegrityError
-  
 
 
 router = APIRouter()
@@ -19,6 +19,14 @@ router = APIRouter(
   prefix="/auth",
   tags=["auth"],
 )
+
+@router.get('/me', response_model=UserInDB)
+async def get_me(
+  current_user: Annotated[User, Depends(get_current_active_user)],
+  
+):
+  return current_user
+  
 
 @router.post("/login")
 async def login_for_access_token(
