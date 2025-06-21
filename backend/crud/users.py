@@ -16,12 +16,7 @@ async def create_user(
   user_create: UserCreate,
 ):
   
-  existing_user = await db.select(User).filter(User.email == user_create.email).first()
-  if existing_user:
-    raise HTTPException(
-      status_code=400,
-      detail="Email already registered"
-    )
+  check_existing_user_query = select(User).filter(User.email == user_create.email)
     
   new_user = User(
     # Information
@@ -43,6 +38,13 @@ async def create_user(
   )
   
   try:
+    result = await db.execute(check_existing_user_query)
+    existing_user = result.scalar_one_or_none()
+    if existing_user:
+      raise HTTPException(
+        status_code=400,
+        detail="User already exist"
+      )
     db.add_all([
       new_user, 
       system_log

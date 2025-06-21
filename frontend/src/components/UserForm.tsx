@@ -9,101 +9,107 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import axios from "axios";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useEffect } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { useEffect } from "react";
 import { AccountStatus, AccountType, type User } from "@/lib/types";
-
+import { toast } from "sonner";
 
 interface UserFormProps {
-  currentUser?: User,
+  currentUser?: User;
+  onUserChange?: () => void;
 }
 
 const formSchema = z.object({
-  firstname: z.string().min(1, "Name is required"),
-  middlename: z.string().min(1, "Name is required"),
-  lastname: z.string().min(1, "Name is required"),
+  firstname: z.string().min(1, "Firstname is required"),
+  middlename: z.string(),
+  lastname: z.string().min(1, "Lastame is required"),
   email: z.string().email("Invalid email address"),
   contact_num: z.string().min(1, "Contact number is required"),
   password: z.string(),
-  account_type:  z.enum([
-    "SUPER_ADMIN",
-  ]).nullable(),
-  status:  z.enum([
-    "ACTIVE",
-    "INACTIVE",
-  ]).nullable(),
+  type: z.enum(["ADMIN", "AGENT", "CLIENT"]).nullable(),
+  status: z.enum(["ACTIVE", "INACTIVE"]).nullable(),
 });
 
-const UserForm: React.FC<UserFormProps> = ({currentUser}) => {
+const UserForm: React.FC<UserFormProps> = ({ currentUser, onUserChange }) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: currentUser
+      ? {
+          firstname: currentUser?.firstname || "",
+          middlename: currentUser?.middlename || "",
+          lastname: currentUser?.lastname || "",
+          email: currentUser?.email || "",
+          contact_num: currentUser?.contact_num || "",
+          password: "",
+          type: currentUser.type as AccountType,
+          status: currentUser.status as AccountStatus,
+        }
+      : {
+          firstname: "",
+          middlename: "",
+          lastname: "",
+          email: "",
+          contact_num: "",
+          password: "",
+          type: AccountType.CLIENT,
+          status: AccountStatus.ACTIVE,
+        },
+  });
 
-   const form = useForm<z.infer<typeof formSchema>>({
-      resolver: zodResolver(formSchema),
-      defaultValues: currentUser ? {
-        firstname: currentUser?.firstname || "",
-        middlename: currentUser?.middlename || "",
-        lastname: currentUser?.lastname || "",
-        email: currentUser?.email || "",
-        contact_num: currentUser?.contact_num || "",
-        password: "",
-        account_type: currentUser.account_type as AccountType, 
-        status: currentUser.status as AccountStatus, 
-      } : {
-        firstname: "",
-        middlename: "",
-        lastname: "",
-        email: "",
-        contact_num: "",
-        password: "",
-        account_type: AccountType.SUPER_ADMIN,
-        status: AccountStatus.ACTIVE,
-      }
-    })
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log(values)
+    if (currentUser) {
+      axios
+        .put(`/api/users/${currentUser.id}`, values, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          form.reset();
+          toast.success('User details updated, refresh page to see changes')
+        })
+        .catch((error) => {
+          const message = error.response.data.detail || 'Unexpected error'
+          toast.error(message);
+        });
+    } else {
+      // New user - create
+      axios
+        .post(`/api/users`, values, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          form.reset();
+          onUserChange?.()
+          toast.success('User added, refresh page to see changes')
 
-    
-
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-      const token = localStorage.getItem("access_token") || "";
-
-      if (currentUser) {
-        axios
-          .put(`${import.meta.env.VITE_API_URL}/api/update-user/${currentUser.id}`, values, {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-          })
-          .then((response) => {
-            console.log(response);
-            form.reset();
-          })
-          .catch((error) => {
-            console.error("Error updating user:", error);
-          });
-      } else {
-        axios
-          .post(`${import.meta.env.VITE_API_URL}/api/create-user`, values, {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-          })
-          .then((response) => {
-            console.log(response);
-            form.reset();
-          })
-          .catch((error) => {
-            console.error("Error updating user:", error);
-          });
-      }
+        })
+        .catch((error) => {
+          const message = error.response.data.detail || 'Unexpected error'
+          toast.error(message);
+        });
     }
+  };
 
-    useEffect(() => {
-    }, [])
-  
+  useEffect(() => {}, []);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -118,9 +124,7 @@ const UserForm: React.FC<UserFormProps> = ({currentUser}) => {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormDescription>
-                  Input First Name
-                </FormDescription>
+                <FormDescription>Input First Name</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -135,9 +139,7 @@ const UserForm: React.FC<UserFormProps> = ({currentUser}) => {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormDescription>
-                  Input Middle Name
-                </FormDescription>
+                <FormDescription>Input Middle Name</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -152,9 +154,7 @@ const UserForm: React.FC<UserFormProps> = ({currentUser}) => {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormDescription>
-                  Input Last Name
-                </FormDescription>
+                <FormDescription>Input Last Name</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -169,9 +169,7 @@ const UserForm: React.FC<UserFormProps> = ({currentUser}) => {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
-                <FormDescription>
-                  Input User Contact Number
-                </FormDescription>
+                <FormDescription>Input User Contact Number</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -179,108 +177,105 @@ const UserForm: React.FC<UserFormProps> = ({currentUser}) => {
         </div>
         {/* CREDENTIALS FIELDS */}
         <div className="grid grid-cols-1 gap-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email:</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormDescription>
-                Input User Email
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email:</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormDescription>Input User Email</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="Atleast 6 characters" {...field} disabled={!!currentUser} />
-              </FormControl>
-              <FormDescription>
-                Input Password
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Atleast 6 characters"
+                    {...field}
+                    disabled={!!currentUser}
+                  />
+                </FormControl>
+                <FormDescription>Input Password</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         {/* ACCOUNT DETAILS FIELDS */}
         <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="account_type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Account Type:</FormLabel>
-              <Select
-                onValueChange={(value) =>
-                  field.onChange(value ? value as AccountType : null)
-                }
-                defaultValue={field.value?.toString() || ""}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Account Type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value={"SUPER_ADMIN"}>
-                    SUPER_ADMIN
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Account Type:</FormLabel>
+                <Select
+                  onValueChange={(value) =>
+                    field.onChange(value ? (value as AccountType) : null)
+                  }
+                  defaultValue={field.value?.toString() || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Account Type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={"CLIENT"}>CLIENT</SelectItem>
+                    <SelectItem value={"ADMIN"}>ADMIN</SelectItem>
+                    <SelectItem value={"AGENT"}>AGENT</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Account Status:</FormLabel>
-              <Select
-                onValueChange={(value) =>
-                  field.onChange(value ? value as AccountStatus : null)
-                }
-                defaultValue={field.value?.toString() || ""}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Account Type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value={"ACTIVE"}>
-                    ACTIVE
-                  </SelectItem>
-                   <SelectItem value={"INACTIVE"}>
-                    INACTIVE
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Account Status:</FormLabel>
+                <Select
+                  onValueChange={(value) =>
+                    field.onChange(value ? (value as AccountStatus) : null)
+                  }
+                  defaultValue={field.value?.toString() || ""}
+                  disabled={!currentUser}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Account Type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={"ACTIVE"}>ACTIVE</SelectItem>
+                    <SelectItem value={"INACTIVE"}>INACTIVE</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-
         <Button type="submit" className="w-full">
           Submit
         </Button>
       </form>
     </Form>
-  )
-}
+  );
+};
 
-export default UserForm
+export default UserForm;

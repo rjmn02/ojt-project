@@ -24,7 +24,6 @@ class UserBase(BaseModel):
   
 class UserCreate(UserBase):
   password: str
-  created_by: str
 
 class UserUpdate(UserBase):
   email: str

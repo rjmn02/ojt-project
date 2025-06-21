@@ -3,11 +3,12 @@ import axios from "axios";
 import type {  User } from "@/lib/types";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
+import UserForm from "@/components/UserForm";
 
 const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
 
-  const fetchLogs = () => {
+  const fetchUsers = () => {
     axios
       .get('/api/users', {
         headers: {
@@ -21,22 +22,27 @@ const UsersPage = () => {
       .catch((error: any) => {
         console.error("Error fetching users", error);
       });
-      
   }
 
   useEffect(() => {
-    document.title = "System Logs";
-    fetchLogs();
+    document.title = "Users";
+    fetchUsers();
   }, []);
 
   return (
-    <div className="flex flex-col items-center space-y-8 min-h-screen mt-25">
-      <h1 className="text-3xl font-bold">Users</h1>
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center gap-20 p-6">
       <div>
+        <h1 className="text-3xl font-bold text-center mb-3">User Form</h1>
+        <UserForm onUserChange={fetchUsers} />
+      </div>
+      <div>
+        <h1 className="text-3xl font-bold text-center mb-3">Users</h1>
         <DataTable columns={columns} data={users} />
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default UsersPage;
