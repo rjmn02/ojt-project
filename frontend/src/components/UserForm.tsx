@@ -20,13 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AccountStatus, AccountType, type User } from "@/lib/types";
 import { toast } from "sonner";
 
 interface UserFormProps {
   currentUser?: User;
   onUserChange?: () => void;
+  owner?: boolean
 }
 
 const formSchema = z.object({
@@ -36,11 +37,13 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   contact_num: z.string().min(1, "Contact number is required"),
   password: z.string(),
-  type: z.enum(["ADMIN", "AGENT", "CLIENT"]).nullable(),
+  type: z.enum(["ADMIN", "MANAGER"]).nullable(),
   status: z.enum(["ACTIVE", "INACTIVE"]).nullable(),
 });
 
 const UserForm: React.FC<UserFormProps> = ({ currentUser, onUserChange }) => {
+  const [isAccountOwner, setIsAccountOwner] = useState<boolean>();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: currentUser
@@ -61,7 +64,7 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onUserChange }) => {
           email: "",
           contact_num: "",
           password: "",
-          type: AccountType.CLIENT,
+          type: AccountType.MANAGER,
           status: AccountStatus.ACTIVE,
         },
   });
@@ -108,7 +111,22 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onUserChange }) => {
     }
   };
 
-  useEffect(() => {}, []);
+  const fetchCurrentUser = () => {
+    axios
+      .get("/auth/me", { withCredentials: true })
+      .then((res) => {
+        if(currentUser && res.data.id == currentUser.id)
+          setIsAccountOwner(true);
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
+  };
+
+
+  useEffect(() => {
+    fetchCurrentUser()
+  }, []);
 
   return (
     <Form {...form}>
@@ -203,7 +221,7 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onUserChange }) => {
                     type="password"
                     placeholder="Atleast 6 characters"
                     {...field}
-                    disabled={!!currentUser}
+                    disabled={!!currentUser && !isAccountOwner}
                   />
                 </FormControl>
                 <FormDescription>Input Password</FormDescription>
@@ -232,9 +250,8 @@ const UserForm: React.FC<UserFormProps> = ({ currentUser, onUserChange }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value={"CLIENT"}>CLIENT</SelectItem>
                     <SelectItem value={"ADMIN"}>ADMIN</SelectItem>
-                    <SelectItem value={"AGENT"}>AGENT</SelectItem>
+                    <SelectItem value={"MANAGER"}>MANAGER</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

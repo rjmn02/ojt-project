@@ -29,7 +29,7 @@ class CarBase(BaseModel):
   price: int
   transmission_type: TransmissionType
   fuel_type: FuelType
-  status: CarStatus = CarStatus.AVAILABLE
+  status: CarStatus
 
 class CarCreate(CarBase):
   pass

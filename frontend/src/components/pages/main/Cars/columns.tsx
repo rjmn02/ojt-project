@@ -1,12 +1,13 @@
 
+import CarsForm from "@/components/CarsForm";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import UserForm from "@/components/UserForm";
-import type { User } from "@/lib/types";
+import type { Car } from "@/lib/types";
 import type { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<Car>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-left p-3">ID</div>,
@@ -15,71 +16,117 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
+    accessorKey: "price",
+    header: ({column}) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Price (PHP)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-  },
-  {
-    id: "fullName",
-    header: () => <div className="text-left p-3">Full Name</div>,
     cell: ({ row }) => {
-      const { firstname, middlename, lastname } = row.original;
-      const fullName = [firstname, middlename, lastname].filter(Boolean).join(" ");
-      return <div className="text-left p-3">{fullName}</div>;
+      const value = row.getValue('price');
+      const formatted = Number(value).toLocaleString('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+      });
+      return <div className="text-left p-3">{formatted}</div>;
     },
   },
   {
-    accessorKey: "contact_num",
-    header: () => <div className="text-left p-3">Contact Number</div>,
+    accessorKey: "vin",
+    header: () => <div className="text-left p-3">VIN Number</div>,
     cell: ({ row }) => {
-      return <div className="text-left p-3">{row.getValue('contact_num')}</div>;
+      return <div className="text-left p-3">{row.getValue('vin')}</div>;
     },
   },
   {
-    accessorKey: "type",
-    header: () => <div className="text-left p-3">Type</div>,
+    accessorKey: "year",
+    header: ({column}) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Year
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
-      return <div className="text-left p-3">{row.getValue('type')}</div>;
+      return <div className="text-left p-3">{row.getValue('year')}</div>;
+    },
+  },
+  {
+    accessorKey: "make",
+    header: () => <div className="text-left p-3">Make</div>,
+    cell: ({ row }) => {
+      return <div className="text-left p-3">{row.getValue('make')}</div>;
+    },
+  },
+  {
+    accessorKey: "model",
+    header: () => <div className="text-left p-3">Model</div>,
+    cell: ({ row }) => {
+      return <div className="text-left p-3">{row.getValue('model')}</div>;
+    },
+  },
+  {
+    accessorKey: "color",
+    header: () => <div className="text-left p-3">Color</div>,
+    cell: ({ row }) => {
+      return <div className="text-left p-3">{row.getValue('color')}</div>;
+    },
+  },
+  {
+    accessorKey: "mileage",
+    header: ({column}) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Mileage (KM)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const value = row.getValue('mileage');
+      const formatted = Number(value).toLocaleString('en-US');
+      return <div className="text-left p-3">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "transmission_type",
+    header: () => <div className="text-left p-3">Transmission</div>,
+    cell: ({ row }) => {
+      return <div className="text-left p-3">{row.getValue('transmission_type')}</div>;
+    },
+  },
+  {
+    accessorKey: "fuel_type",
+    header: () => <div className="text-left p-3">Fuel</div>,
+    cell: ({ row }) => {
+      return <div className="text-left p-3">{row.getValue('fuel_type')}</div>;
     },
   },
   {
     accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-  {
-    accessorKey: "updated_at",
-    header: () => <div className="text-left p-3">Last Updated At</div>,
+    header: () => <div className="text-left p-3">Status</div>,
     cell: ({ row }) => {
-      const updated_at = row.getValue("updated_at") as Date;
-      const formattedDate = new Date(updated_at).toLocaleString(); // Adjust formatting as needed
-
-      return <div className="text-left p-3">{formattedDate}</div>;
+      return <div className="text-left p-3">{row.getValue('status')}</div>;
     },
   },
   {
     id: "actions",
     header: () => <div className="text-left p-3">Actions</div>,
     cell: ({ row }) => {
-      const user = row.original
+      const car = row.original
  
       return (
         <div className="flex flex-row gap-4">
@@ -88,8 +135,8 @@ export const columns: ColumnDef<User>[] = [
               <Button variant="outline">Edit</Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogTitle className="text-center">User Edit Form</DialogTitle>
-              <UserForm currentUser={user}/>
+              <DialogTitle className="text-center">Car Edit Form</DialogTitle>
+              <CarsForm currentCar={car}/>
             </DialogContent>
           </Dialog>
         </div>

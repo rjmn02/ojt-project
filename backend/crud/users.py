@@ -69,7 +69,7 @@ async def read_users(
   search: Optional[str] = None
 ):
   try:
-    query = select(User)
+    query = select(User).where(User.id != current_user.id)
       
     if type:
         query = query.where(User.type == type)

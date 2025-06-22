@@ -17,25 +17,36 @@ import Register from "./components/pages/main/Register";
 import SystemLogsPage from "./components/pages/main/SystemLogs/SystemLogsPage";
 import UsersPage from "./components/pages/main/Users/UsersPage";
 import CarsPage from "./components/pages/main/Cars/CarsPage";
+import Unauthorized from "./components/pages/main/Unauthorized";
+import ProfilePage from "./components/pages/main/ProfilePage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
-
+      <Route path="/unauthorized" element={<Unauthorized />} />
       <Route
         path="/"
         element={
-          <ProtectedRoute allowedUsers={["ADMIN", "AGENT", "CLIENT"]}>
+          <ProtectedRoute allowedUsers={["ADMIN", "MANAGER"]}>
             <Body element={<MainPage />} />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute allowedUsers={["ADMIN", "MANAGER"]}>
+            <Body element={<ProfilePage />} />
           </ProtectedRoute>
         }
       />
       <Route
         path="/cars"
         element={
-          <ProtectedRoute allowedUsers={["ADMIN", "AGENT"]}>
+          <ProtectedRoute allowedUsers={["ADMIN", "MANAGER"]}>
             <Body element={<CarsPage />} />
           </ProtectedRoute>
         }

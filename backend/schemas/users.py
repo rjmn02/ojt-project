@@ -4,8 +4,7 @@ from typing import Any, Optional
 from pydantic import BaseModel
 class AccountType(str, Enum):
   ADMIN = "ADMIN"
-  AGENT = "AGENT"
-  CLIENT = "CLIENT"
+  MANAGER = "MANAGER"
   
 class AccountStatus (str, Enum):
   ACTIVE = "ACTIVE"

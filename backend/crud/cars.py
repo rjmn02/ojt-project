@@ -25,6 +25,7 @@ async def create_car(
     price = car_create.price,
     transmission_type = car_create.transmission_type,
     fuel_type = car_create.fuel_type,
+    status = car_create.status,
     
     created_by = current_user.email,
     updated_by = current_user.email
@@ -123,6 +124,8 @@ async def update_car_by_id(
     car.price = car_edit.price
     car.transmission_type = car_edit.transmission_type
     car.fuel_type = car_edit.fuel_type
+    car.status = car_edit.status
+    
     
     car.updated_by = current_user.email
     
@@ -142,3 +145,9 @@ async def update_car_by_id(
     await db.rollback() 
     raise HTTPException(status_code=500, detail=f"An unexpected error occurred. {str(e)}")
     
+
+# async def delete_car(
+#   id: int,
+#   db: AsyncSession,
+#   current_user: User
+# ): 

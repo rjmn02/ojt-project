@@ -30,7 +30,7 @@ const ProtectedRoute = ({
   }
 
   if (!authorized) {
-    navigate('/login')
+    navigate('/unauthorized')
   }
 
   return <>{children}</>;

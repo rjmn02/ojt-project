@@ -1,20 +1,28 @@
-export interface Item {
-  id: number;
-  name: string;
-  description: string
-  created_by: string;
-  updated_by:string;
-  created_date: Date;
-  updated_date: Date;
-}
-
 export interface SystemLog {
   id: number;
   user_id: number;
   action: string;
-  timestamp: string;
-  updated_at: string;   
+  timestamp: Date;
+  updated_at: Date;   
 } 
+
+export interface Car {
+  id: number;
+  vin: string;
+  year: number;
+  make: string;
+  model: string;
+  color: string;
+  mileage: number;
+  price: number;
+  transmission_type: TransmissionType;
+  fuel_type: FuelType;
+  status: CarStatus;
+  created_at: Date; // ISO format Datedate-time string
+  updated_at: Date;
+  created_by: string;
+  updated_by: string;
+}
 
 
 export interface User {
@@ -54,8 +62,7 @@ export enum CarStatus {
 
 export enum AccountType {
   ADMIN = "ADMIN",
-  AGENT = "AGENT",
-  CLIENT = "CLIENT"
+  MANAGER = "MANAGER",
 }
 
 export enum AccountStatus {

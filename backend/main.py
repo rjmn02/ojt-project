@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select
 from database import engine
 from models.base import Base  # ADDED IMPORT
-from routers import cars, auth, sales_transactions, system_logs, users
+from routers import cars, auth, system_logs, users
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from dependencies import get_password_hash
@@ -41,7 +41,6 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(cars.router)
-app.include_router(sales_transactions.router)
 app.include_router(system_logs.router)
 
 # app.mount("/", StaticFiles(directory="D:/Projects/ojt-project/frontend/dist", html=True), name="static")

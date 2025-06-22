@@ -35,7 +35,7 @@ const formSchema = z.object({
   lastname: z.string().min(1, "Lastname is required"),
   contact_num: z.string().min(1, "Contact number is required"),
 
-  type: z.enum(["AGENT", "CLIENT"]),
+  type: z.enum(["ADMIN", "MANAGER"]),
 });
 
 const Register = () => {
@@ -52,7 +52,7 @@ const Register = () => {
       lastname: "",
       contact_num: "",
 
-      type: AccountType.AGENT,
+      type: AccountType.MANAGER,
     },
   });
 
@@ -67,7 +67,7 @@ const Register = () => {
       .then((response) => {
         console.log(response);
         form.reset();
-        navigate('/')
+        navigate('/login')
       })
       .catch((error) => {
         console.error("Error registering:", error);
@@ -201,8 +201,7 @@ const Register = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={"AGENT" as AccountType.AGENT}>AGENT</SelectItem>
-                      <SelectItem value={"CLIENT" as AccountType.CLIENT}>CLIENT</SelectItem>
+                      <SelectItem value={"MANAGER" as AccountType.MANAGER}>MANAGER</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
