@@ -44,6 +44,7 @@ const Login = () => {
         withCredentials: true,
       })
       .then((response) => {
+        console.log(response)
         form.reset();
         navigate('/');
       })

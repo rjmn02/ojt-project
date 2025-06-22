@@ -43,7 +43,7 @@ app.include_router(users.router)
 app.include_router(cars.router)
 app.include_router(system_logs.router)
 
-# app.mount("/", StaticFiles(directory="D:/Projects/ojt-project/frontend/dist", html=True), name="static")
+app.mount("/", StaticFiles(directory="D:/Projects/ojt-project/frontend/dist", html=True), name="static")
 
 
 async def initialize_admin_user():

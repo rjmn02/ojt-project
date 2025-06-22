@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import type { SystemLog, User } from "@/lib/types";
+import type { SystemLog } from "@/lib/types";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 

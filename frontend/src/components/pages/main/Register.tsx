@@ -80,8 +80,10 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <h1 className="text-center text-5xl">REGISTRATION FORM</h1>
           {/* BASIC INFO FIELD */}
           <div className="grid grid-cols-2 gap-4">
             <FormField
