@@ -26,8 +26,7 @@ app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:8000",
-    
-  ]
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,7 +42,7 @@ app.include_router(users.router)
 app.include_router(cars.router)
 app.include_router(system_logs.router)
 
-app.mount("/", StaticFiles(directory="D:/Projects/ojt-project/frontend/dist", html=True), name="static")
+# app.mount("/", StaticFiles(directory="D:/Projects/ojt-project/frontend/dist", html=True), name="static")
 
 
 async def initialize_admin_user():

@@ -103,7 +103,7 @@ const CarsForm: React.FC<UserFormProps> = ({ currentCar }) => {
         .then((response) => {
           console.log(response);
           form.reset();
-          toast.success("Car added, refresh page to see changes");
+          toast.success("Car added");
         })
         .catch((error) => {
           const message = error.response.data.detail || "Unexpected error";

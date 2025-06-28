@@ -1,6 +1,6 @@
 from typing import Annotated, List, Optional
 from fastapi import  APIRouter, Depends
-from crud.cars import create_car, read_car_by_id, read_cars, update_car_by_id
+from crud.cars import create_car, delete_car, read_car_by_id, read_cars, update_car_by_id
 from dependencies import AsyncSessionDep, get_current_active_user
 from models.cars import CarStatus, FuelType, TransmissionType
 from models.users import User
@@ -76,5 +76,18 @@ async def put_car(
     id=id,
     db=db,
     car_edit=car_edit,
+    current_user=current_user
+  )
+  
+@router.delete('/{id}', response_model = dict)
+async def delete_car_route(
+  id: int,
+  db: AsyncSessionDep,
+  current_user: Annotated[User, Depends(get_current_active_user)]
+):
+  
+  return await delete_car(
+    id=id,
+    db=db,
     current_user=current_user
   )

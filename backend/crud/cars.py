@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import  or_, select
+from sqlalchemy import  delete, or_, select
 from models.cars import Car, CarStatus, FuelType, TransmissionType
 from models.system_logs import System_Log
 from models.users import User
@@ -146,8 +146,31 @@ async def update_car_by_id(
     raise HTTPException(status_code=500, detail=f"An unexpected error occurred. {str(e)}")
     
 
-# async def delete_car(
-#   id: int,
-#   db: AsyncSession,
-#   current_user: User
-# ): 
+async def delete_car(
+  id: int,
+  db: AsyncSession,
+  current_user: User
+): 
+  try:
+    # Fetch the car first to log the info and check existence
+    car = await read_car_by_id(id=id, db=db)
+    if not car:
+      raise HTTPException(status_code=404, detail="Car not found")
+
+    # Create a log before deleting
+    system_log = System_Log(
+      action=f"User {current_user.id} deleted car {car.vin}",
+      user_id=current_user.id,
+    )
+
+    # Delete the car
+    query = delete(Car).where(Car.id == id)
+    await db.execute(query)
+    db.add(system_log)
+    await db.commit()
+    
+    return {"detail": f"Car {car.vin} {car.year} {car.make} {car.model} deleted successfully"}
+
+  except Exception as e:
+    await db.rollback()
+    raise HTTPException(status_code=500, detail=f"An unexpected error occurred. {str(e)}")
